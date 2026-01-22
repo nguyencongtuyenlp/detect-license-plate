@@ -75,5 +75,9 @@ def predict_realtime():
     })
 
 if __name__ == '__main__':
-    # Allow external access for mobile testing
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Cổng mặc định là 5000 cho máy local, 7860 cho Hugging Face Spaces
+    port = int(os.environ.get("PORT", 5000))
+    if port == 5000: # Nếu chạy local thì mở port 5000
+        app.run(debug=True, host='0.0.0.0', port=5000)
+    else: # Nếu chạy trên Cloud (Hugging Face)
+        app.run(host='0.0.0.0', port=port)

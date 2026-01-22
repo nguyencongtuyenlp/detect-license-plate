@@ -7,19 +7,27 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
+# Tạo người dùng mới với UID 1000 (yêu cầu của Hugging Face)
+RUN useradd -m -u 1000 user
+USER user
+ENV PATH="/home/user/.local/bin:$PATH"
+
 # Thiết lập thư mục làm việc
 WORKDIR /app
 
 # Sao chép file yêu cầu và cài đặt thư viện
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY --chown=user requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Sao chép toàn bộ mã nguồn vào container
-COPY . .
+# Sao chép toàn bộ mã nguồn vào container (với quyền sở hữu của user)
+COPY --chown=user . .
 
-# Hugging Face Spaces mặc định chạy cổng 7860
+# Hugging Face Spaces chạy cổng 7860
 EXPOSE 7860
 
 # Chạy ứng dụng Flask
-# Lưu ý: Sửa port thành 7860 và host 0.0.0.0 trong app.py
+# Thiết lập biến môi trường PORT cho app.py nhận diện
+ENV PORT=7860
+
 CMD ["python", "app.py"]

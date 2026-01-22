@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YOLO AI | License Plate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ios-bg: #000000;
+            --ios-accent: #007AFF;
+            --ios-glass: rgba(25, 25, 25, 0.6);
+            --ios-glass-border: rgba(255, 255, 255, 0.12);
+            --ios-text: #FFFFFF;
+            --ios-text-secondary: rgba(255, 255, 255, 0.5);
+            --mesh-gradient: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--ios-bg);
+            background-image: var(--mesh-gradient);
+            background-attachment: fixed;
+            color: var(--ios-text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* iOS 26 Mesh Animation */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(0, 122, 255, 0.05) 0%, rgba(255, 45, 85, 0.05) 100%);
+            z-index: -1;
+            filter: blur(100px);
+            animation: meshMove 20s infinite alternate;
+        }
+
+        @keyframes meshMove {
+            0% {
+                transform: scale(1) translate(0, 0);
+            }
+
+            100% {
+                transform: scale(1.2) translate(5%, 5%);
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 40px 20px;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: -1px;
+            background: linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--ios-text-secondary);
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+
+        /* Pill Tabs - Apple Style */
+        .tab-switcher {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 4px;
+            border-radius: 99px;
+            display: flex;
+            margin-bottom: 30px;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--ios-glass-border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 99px;
+            border: none;
+            background: transparent;
+            color: var(--ios-text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--ios-text);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Glass Cards */
+        .card {
+            background: var(--ios-glass);
+            backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid var(--ios-glass-border);
+            border-radius: 32px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            display: none;
+            animation: cardSlide 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes cardSlide {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Upload Area */
+        .upload-zone {
+            aspect-ratio: 4/3;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--ios-accent);
+            background: rgba(0, 122, 255, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Action Buttons */
+        .primary-btn {
+            width: 100%;
+            background: var(--ios-accent);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
+        }
+
+        .primary-btn:active {
+            transform: scale(0.97);
+            filter: brightness(0.9);
+        }
+
+        /* Results Display */
+        .result-view {
+            margin-top: 20px;
+        }
+
+        .result-img-wrapper {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 1px solid var(--ios-glass-border);
+        }
+
+        img,
+        video {
+            width: 100%;
+            display: block;
+        }
+
+        .label-tag {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Realtime View */
+        .camera-container {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #000;
+            aspect-ratio: 3/4;
+        }
+
+        #realtimeResult {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        video {
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Loader */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .ios-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--ios-accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Mobile specific tweaks */
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding-top: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loader">
+        <div class="ios-spinner"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>YOLO Vision</h1>
+            <p>iOS 26 License Plate Recognition</p>
+        </header>
+
+        <div class="tab-switcher">
+            <button class="tab-btn active" onclick="switchTab('upload', this)">Upload</button>
+            <button class="tab-btn" onclick="switchTab('realtime', this)">Real-time</button>
+        </div>
+
+        <!-- UPLOAD SECTION -->
+        <div id="upload-section" class="card active">
+            <form id="uploadForm">
+                <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                    <div id="upload-content">
+                        <div class="upload-icon">📸</div>
+                        <p style="margin:0; font-weight:500;">Chọn hoặc kéo ảnh</p>
+                        <p style="margin:5px 0 0; font-size: 0.8rem; color: var(--ios-text-secondary);">Hỗ trợ JPG, PNG
+                        </p>
+                    </div>
+                    <input type="file" id="fileInput" name="file" accept="image/*" hidden
+                        onchange="handleFilePreview(this)">
+                    <img id="filePreview"
+                        style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; display:none;">
+                </div>
+                <button type="submit" class="primary-btn">Phân tích biển số</button>
+            </form>
+
+            <div id="uploadResults" class="result-view" style="display: none;">
+                <div class="result-img-wrapper">
+                    <span class="label-tag">KẾT QUẢ AI</span>
+                    <img id="resImg" src="" alt="Result">
+                </div>
+            </div>
+        </div>
+
+        <!-- REALTIME SECTION -->
+        <div id="realtime-section" class="card">
+            <div class="camera-container">
+                <video id="video" autoplay playsinline muted></video>
+                <img id="realtimeResult">
+                <span class="label-tag" id="statusTag">CHẾ ĐỘ CHỜ</span>
+            </div>
+
+            <div class="controls">
+                <button id="startBtn" class="primary-btn" style="margin:0;">Bắt đầu</button>
+                <button id="stopBtn" class="secondary-btn">Dừng</button>
+            </div>
+            <p style="text-align: center; font-size: 0.75rem; color: var(--ios-text-secondary); margin-top: 15px;">
+                Đã tối ưu hóa cho ống kính Ultra Wide và Camera chính
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const loader = document.getElementById('loader');
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+
+            btn.classList.add('active');
+            document.getElementById(tab + '-section').classList.add('active');
+
+            if (tab !== 'realtime') stopCamera();
+        }
+
+        function handleFilePreview(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const preview = document.getElementById('filePreview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    document.getElementById('upload-content').style.opacity = '0';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // --- UPLOAD LOGIC ---
+        document.getElementById('uploadForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files[0]) return;
+
+            loader.style.display = 'flex';
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const res = await fetch('/predict', { method: 'POST', body: formData });
+                const data = await res.json();
+                document.getElementById('resImg').src = '/' + data.result_image + '?t=' + Date.now();
+                document.getElementById('uploadResults').style.display = 'block';
+                // Scroll to result
+                setTimeout(() => {
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                }, 100);
+            } catch (err) {
+                alert('Lỗi hệ thống');
+            } finally {
+                loader.style.display = 'none';
+            }
+        };
+
+        // --- REALTIME LOGIC ---
+        const video = document.getElementById('video');
+        const realtimeResult = document.getElementById('realtimeResult');
+        const statusTag = document.getElementById('statusTag');
+        const startBtn = document.getElementById('startBtn');
+        let stream = null;
+        let interval = null;
+
+        startBtn.onclick = async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: "environment",
+                        width: { 理想: 1280 },
+                        height: { 理想: 720 }
+                    }
+                });
+                video.srcObject = stream;
+                realtimeResult.style.display = 'block';
+                statusTag.innerText = 'ĐANG QUÉT...';
+                statusTag.style.background = 'rgba(255, 45, 85, 0.6)';
+
+                interval = setInterval(captureAndPredict, 120);
+                startBtn.innerText = 'Đang chạy';
+                startBtn.disabled = true;
+                startBtn.style.opacity = '0.5';
+            } catch (err) {
+                alert('Không thể mở Camera');
+            }
+        };
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+            if (interval) clearInterval(interval);
+            realtimeResult.style.display = 'none';
+            statusTag.innerText = 'CHẾ ĐỘ CHỜ';
+            statusTag.style.background = 'rgba(0,0,0,0.5)';
+            startBtn.innerText = 'Bắt đầu';
+            startBtn.disabled = false;
+            startBtn.style.opacity = '1';
+        }
+
+        document.getElementById('stopBtn').onclick = stopCamera;
+
+        async function captureAndPredict() {
+            if (video.videoWidth === 0) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+
+            const base64 = canvas.toDataURL('image/jpeg', 0.4);
+
+            try {
+                const res = await fetch('/predict_realtime', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: base64 })
+                });
+                const data = await res.json();
+                if (data.result_image) {
+                    realtimeResult.src = data.result_image;
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+# Flask
+static/uploads/*
+!static/uploads/.gitkeep
+__pycache__/
+*.pyc
+
+# YOLO
+runs/
+
+# OS
+.DS_Store
+Thumbs.db

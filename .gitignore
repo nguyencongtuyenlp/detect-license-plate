@@ -3,9 +3,12 @@ static/uploads/*
 !static/uploads/.gitkeep
 __pycache__/
 *.pyc
+.ipynb_checkpoints/
 
-# YOLO
+# YOLO & Data
+# data/  <-- Bỏ comment nếu KHÔNG muốn đẩy folder ảnh lên
 runs/
+# *.pt   <-- Đã bỏ qua để đẩy model lên (6MB nên đẩy tốt)
 
 # OS
 .DS_Store
